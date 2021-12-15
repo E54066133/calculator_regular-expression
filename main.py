@@ -72,3 +72,32 @@ def fun6_1(string):
         return '請輸入正確的算式'
     else:                                                                                 # 若運算式處理到只剩一個數字，則該數字最終運算結果
         return string
+    
+    
+    
+# 主程式    
+if __name__ == "__main__":    
+    if text[0:2] == '計算' and text[-4:] == '等於多少':     # 判斷 "計算(計算式)等於多少"  EX.計算6*9-12等於多少
+        string = text[2:-4]
+        plus = re.search('[(][\d\+\-*/.]+[)]',string)      # 判斷計算式中是否有括號
+        if plus:                                           # 若有括號，先算括號內之運算式
+            while plus:
+                d = str(plus)
+                s = d.split("'")
+                response_plus = HW.fun6_1(s[1][1:-1])      # 呼叫 fun6_1() 計算程式
+                b = re.search('[\-]*[\d]+[\.]*[\d]*[\+\-*/][\-]*[\d]+[\.]*[\d]*',response_plus)   # 判斷式子中是否存在還未運算完的部分
+                while b:
+                    if b:
+                        response_plus = HW.fun6_1(response_plus)                                  # 重複疊帶運算式，直到該括號內運算式處理完畢
+                        b = re.search('[\-]*[\d]+[\.]*[\d]*[\+\-*/][\-]*[\d]+[\.]*[\d]*',response_plus)
+                string = re.sub('[(][\d\+\-*/.]+[)]', str(response_plus), string, 1)              # 將括號運算式替換成計算的結果
+                plus = re.search('[(][\d\+\-*/.]+[)]',string)                                     # 尋找是否還有其他外擴號 EX. ((12-6)*8)，若有則回到84行，繼續處理外括號運算
+        response_temp = HW.fun6_1(string)                                                         # 處理不含括號的運算式    
+        a = re.search('[\-]*[\d]+[\.]*[\d]*[\+\-*/][\-]*[\d]+[\.]*[\d]*',response_temp)           # 判斷算式是否還有未完成的部分
+        while a:                                                                                  # 疊代運算式直到完成
+            if a:
+                response_temp = HW.fun6_1(response_temp)
+                a = re.search('[0-9\.]+[*/\+\-][0-9\.]+',response_temp)
+        if a == None:                                                                             # 計算完成
+            response = response_temp
+    print("運算結果為",response)
